@@ -6,12 +6,14 @@ import time
 
 def black_jack():
     
-    # Initalize variables
+    #Initalize variables
     game_over = False
     counter = 0
     
     # Finds out how many players there will be: max 5
-    n_players = int(input('How many players are there? (Max 5):'))
+    inputWindow = InputDialog3()
+    n_players = inputWindow.getValues()
+    #n_players = int(input('How many players are there? (Max 5):'))
     while n_players < 1 or n_players > 5:
         n_players = int(input('How many players are there? (Max 5):'))
         
@@ -1033,6 +1035,44 @@ class AddingCards():
     def close(self):
         """ close the input window """
         self.win.close()
+
+    class InputDialog3:
+
+        """ A custom window for getting simulation values (angle, velocity,
+        and height) from the user."""
+
+        def __init__(self, players=0):
+            """ Build and display the input window """
+
+            self.win = win = GraphWin("How Many Players", 500, 500)
+            win.setCoords(0, 4.5, 4, .5)
+
+            Text(Point(1, 1), "How Many Players?").draw(win)
+            self.players = Entry(Point(3, 1), 5).draw(win)
+            self.players.setText(str(players))
+            self.confirm = Button(win, Point(1, 4), 1.25, .5, "Confirm!")
+            self.confirm.activate()
+
+        def getValues(self):
+            """ return input values """
+
+            players = float(self.players.getText())
+            return players
+
+        def interact(self):
+            """ wait for user to click Quit or Fire button
+            Returns a string indicating which button was clicker
+            """
+
+            while True:
+                pt = self.win.getMouse()
+                if self.confirm.clicked(pt):
+                    return "Confrim"
+
+        def close(self):
+            """ close the input window """
+            self.win.close()
+
 
 black_jack()
 
