@@ -12,7 +12,13 @@ def black_jack():
     
     # Finds out how many players there will be: max 5
     inputWindow = InputDialog3()
-    n_players = inputWindow.getValues()
+    while True:
+        selection = inputWindow.interact()
+        if selection == "Confirm":
+            n_players = int(inputWindow.getValues())
+            inputWindow.close()
+            break
+    print(n_players)
     #n_players = int(input('How many players are there? (Max 5):'))
     while n_players < 1 or n_players > 5:
         n_players = int(input('How many players are there? (Max 5):'))
@@ -1036,7 +1042,7 @@ class AddingCards():
         """ close the input window """
         self.win.close()
 
-    class InputDialog3:
+class InputDialog3:
 
         """ A custom window for getting simulation values (angle, velocity,
         and height) from the user."""
@@ -1067,7 +1073,7 @@ class AddingCards():
             while True:
                 pt = self.win.getMouse()
                 if self.confirm.clicked(pt):
-                    return "Confrim"
+                    return "Confirm"
 
         def close(self):
             """ close the input window """
