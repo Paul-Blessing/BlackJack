@@ -9,19 +9,17 @@ def black_jack():
     #Initalize variables
     game_over = False
     counter = 0
+    n_players = 0
     
     # Finds out how many players there will be: max 5
-    inputWindow = InputDialog3()
-    while True:
-        selection = inputWindow.interact()
-        if selection == "Confirm":
-            n_players = int(inputWindow.getValues())
-            inputWindow.close()
-            break
-    print(n_players)
-    #n_players = int(input('How many players are there? (Max 5):'))
     while n_players < 1 or n_players > 5:
-        n_players = int(input('How many players are there? (Max 5):'))
+        inputWindow = InputDialog3()
+        while True:
+            selection = inputWindow.interact()
+            if selection == "Confirm":
+                n_players = int(inputWindow.getValues())
+                inputWindow.close()
+                break
         
     # Creates a list of players, and a list of players still in the game (T/F)
     player_list,players_in = create_players(n_players)
@@ -56,9 +54,7 @@ def black_jack():
                 #window.close()
                 break
     inputwin.close()
-    
 
-        
     # Checks for a game over
     game_over, win, players_in2 = game_check_new(players_hands,dealer_hand,player_list,players_in)
     
@@ -136,8 +132,8 @@ def black_jack():
                         print(f"Hit the special where dealer is between 17 and 21")
                         # Compares the dealer's hand to the remaning players for the winner
                         highest, winner = highest_score(players_hands3,player_list3)
-                        dealer_hand,win, best,loser = final_compare(highest,winner,dealer_hand)
-                        win8 = GameOverSpecial(win,winner,best,loser)
+                        dealer_hand, win, best, loser = final_compare(highest, winner, dealer_hand)
+                        win8 = GameOverSpecial(win, winner, best, loser)
                         choice = win8.interact()
                         while True:
                             if choice == 'Quit':
@@ -147,8 +143,11 @@ def black_jack():
                         break
                 else:
                     # Keeps adding cards until the dealer hits b/w 17-21 or busts
-                    counter +=1
-                    dealer_hand = add_card(dealer_hand)
+                    counter += 1
+                    dealer_hand, dealer_add_card = add_card(dealer_hand)
+                    dealer_add_win = AddingCards("dealer", dealer_hand, dealer_add_card)
+                    time.sleep(5)
+                    dealer_add_win.close()
                     print()
                     print(f'{counter} cards added: New dealer hand {dealer_hand}')
                     game_over,win, players_in = game_check_new(players_hands3,dealer_hand,player_list3,players_in4)
@@ -271,13 +270,12 @@ def game_check_new(players_hands,dealer_hand,players,players_in):
         end = 'Special'
     elif win == [] and dealer_hand > 21:
         end = 'dealer_bust'
-    
-        
+
     return end, win, players_in2
+
 
 def show_hand(hand,player):
     print(f"{player}'s hand is: {hand}")
-
 
 
 def game_check2(player_hand,dealer_hand):
@@ -424,6 +422,7 @@ def final_compare(highest,winner,dealer_hand):
         loser= highest
         return dealer_hand,win, best,loser
 
+
 def game_check(players_hands,dealer_hand,players,players_in):
     
     win = []
@@ -463,6 +462,7 @@ def game_check(players_hands,dealer_hand,players,players_in):
         win = 'dealer'
     return end, win, players_in2
 
+
 def highest_score(players_hands,players):
     counter = 0
     compare = []
@@ -489,17 +489,20 @@ def highest_score(players_hands,players):
     
     return highest, winners
 
+
 def ace_value(hand):
     if hand + 11 >= 17 and hand + 11 <= 21:
         return 11
     else:
         return 1
 
+
 def is_ace(card):
     if card == 0:
         return True
     else:
         return False
+
 
 def create_players(n_players):
     player_list = []
@@ -512,6 +515,7 @@ def create_players(n_players):
         player_list.append('Player' + str(player))
         
     return player_list,players_in
+
 
 def get_initial_hand(players):
     cards = {1:0,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,11:10,12:10}
@@ -537,6 +541,7 @@ def get_initial_hand(players):
     #player_hands3 = check_aces(player_hands2)
         
     return player_hands3,player_hands4
+
 
 def check_aces(player_hands):
     counter = 0
@@ -586,12 +591,12 @@ def add_card(hand):
     else:
         new_hand += cards[new_card]
         print(f"New card added to hand {cards[new_card]}")
-        return new_hand
+        return new_hand, new_card
 
 
 class GameOverSpecial:
     
-        def __init__(self,win,winners,best,loser):
+        def __init__(self,win,winners,best, loser=0):
             """ Build and display the input window """
             self.winners = winners
             if win == 'draw':
@@ -662,7 +667,6 @@ class GameOverSpecial:
                     
                 self.quit = Button(win, Point(2,4), 1.25, .5, "Quit")
                 self.quit.activate()
-                
 
         def update(self,players,hands):
             """ return input values """
@@ -689,6 +693,7 @@ class GameOverSpecial:
             """ close the input window """
             self.win.close()
 
+
 class InputDialog2:
 
     """ A custom window for getting simulation values (angle, velocity,
@@ -708,14 +713,12 @@ class InputDialog2:
         
         self.players = players
 
-        
         for i in self.players:
             Text(Point(1,1.5+increaser), "Hands").draw(win)
             entry = Entry(Point(3,1.5+increaser), 5).draw(win)
             hand = 0
             entry.setText(str(hand))
             increaser += .5
-
 
         self.hand = Button(win, Point(1,4), 1.25, .5, "Hand")
         self.hand.activate()
@@ -750,6 +753,7 @@ class InputDialog2:
         """ close the input window """
         self.win.close()
 
+
 class ShowHand:
 
     """ A custom window for getting simulation values (angle, velocity,
@@ -767,12 +771,10 @@ class ShowHand:
         
         self.player = player
 
-        
         Text(Point(1,2), "Hand").draw(win)
         entry = Entry(Point(3,2), 5).draw(win)
         hand = 0
         entry.setText(str(hand))
-
 
         self.hand = Button(win, Point(1,4), 1.25, .5, "Hand")
         self.hand.activate()
@@ -790,7 +792,6 @@ class ShowHand:
         entry = Entry(Point(3,2), 5).draw(self.win)
         hand = hands
         entry.setText(str(hand))
-
 
     def interact(self):
         """ wait for user to click Quit or Fire button
@@ -811,11 +812,11 @@ class ShowHand:
                 return "Done"
             if self.hand.clicked(pt):
                 return "Hand"
-        
 
     def close(self):
         """ close the input window """
         self.win.close()
+
 
 class GameOver:
     
@@ -837,8 +838,6 @@ class GameOver:
                     entry.setText(str(winners[0+counter]))
                     increaser += .5
                     counter += 1
-
-
 
                 self.quit = Button(win, Point(2,4), 1.25, .5, "Quit")
                 self.quit.activate()
@@ -877,7 +876,6 @@ class GameOver:
                     
                 self.quit = Button(win, Point(2,4), 1.25, .5, "Quit")
                 self.quit.activate()
-                
 
         def update(self,players,hands):
             """ return input values """
@@ -906,6 +904,7 @@ class GameOver:
             """ close the input window """
             self.win.close()
 
+
 class DealerHand():
     """ A custom window for getting simulation values (angle, velocity,
     and height) from the user."""
@@ -919,8 +918,7 @@ class DealerHand():
         Text(Point(1,1), "Dealer's Hand").draw(win)
         p_ent = Entry(Point(3,1), 7).draw(win)
         p_ent.setText("???")
-        
-        
+
         deal_card = Text(Point(1,2), "Dealer Card 1").draw(win)
         deal_card.setStyle('bold')
         deal_card.setSize(20)
@@ -934,7 +932,6 @@ class DealerHand():
 
         self.done = Button(win, Point(2,4), 1.25, .5, "Done")
         self.done.activate()
-
 
     def interact(self):
         """ wait for user to click Quit or Fire button
@@ -951,9 +948,6 @@ class DealerHand():
             pt = self.win.getMouse()
             if self.done.clicked(pt):
                 return "Done"
-            if self.hand.clicked(pt):
-                return "Hand"
-        
 
     def close(self):
         """ close the input window """
@@ -965,7 +959,7 @@ class AddingCards():
     """ A custom window for getting simulation values (angle, velocity,
     and height) from the user."""
 
-    def __init__(self, player,hand,new_card="N/A", players_ent = 0):
+    def __init__(self, player, hand, new_card="N/A"):
         """ Build and display the input window """
                    
         self.win = win = GraphWin("Black Jack Adding Cards", 500, 500)
@@ -977,7 +971,6 @@ class AddingCards():
         
         self.player = player
 
-        
         Text(Point(1,2), "New Card").draw(win)
         entry = Entry(Point(3,2), 5).draw(win)
         entry.setText(str(new_card))
@@ -986,14 +979,23 @@ class AddingCards():
         entry = Entry(Point(3,3), 5).draw(win)
         entry.setText(str(hand))
 
-
         self.add = Button(win, Point(1,4), 1.25, .5, "Add")
         self.add.activate()
 
         self.done = Button(win, Point(3,4), 1.25, .5, "Done")
         self.done.activate()
 
-    def update(self,players,hands,new_card=0):
+        if player == 'dealer':
+            if hand >= 17 and hand < 21:
+                Text(Point(2,2.5), "Hit Between 17 and 21").draw(win)
+        elif player == 'dealer':
+            if hand == 21:
+                Text(Point(2, 2.5), "Dealer hit 21!").draw(win)
+        elif player == 'dealer':
+            if hand > 21:
+                Text(Point(2, 2.5), "Dealer Busted!").draw(win)
+
+    def update(self, players, hands, new_card=0):
         """ return input values """
         
         Text(Point(1,1), "Player").draw(self.win)
@@ -1015,7 +1017,6 @@ class AddingCards():
             winText = Text(Point(2,3.5), "21!!").draw(self.win)
             winText.setStyle("bold")
             winText.setSize(20)
-    
 
     def interact(self):
         """ wait for user to click Quit or Fire button
@@ -1034,16 +1035,15 @@ class AddingCards():
             pt = self.win.getMouse()
             if self.done.clicked(pt):
                 return "Done"
-            if self.hand.clicked(pt):
+            if self.add.clicked(pt):
                 return "Hand"
-        
 
     def close(self):
         """ close the input window """
         self.win.close()
 
-class InputDialog3:
 
+class InputDialog3:
         """ A custom window for getting simulation values (angle, velocity,
         and height) from the user."""
 
